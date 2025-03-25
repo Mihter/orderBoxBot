@@ -1,0 +1,33 @@
+-- Таблица для хранения товаров
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL, -- Название товара
+    price DECIMAL(10, 2) NOT NULL -- Цена товара
+);
+
+-- Таблица для хранения готовых коробок
+CREATE TABLE boxes (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL, -- Название коробки
+    base_price DECIMAL(10, 2) NOT NULL -- Базовая цена коробки
+);
+
+-- Таблица для связи коробок и товаров
+CREATE TABLE box_products (
+    box_id INT REFERENCES boxes(id) ON DELETE CASCADE,
+    product_id INT REFERENCES products(id) ON DELETE CASCADE,
+    quantity INT NOT NULL DEFAULT 1, -- Количество товара в коробке
+    PRIMARY KEY (box_id, product_id) -- Композитный ключ
+);
+
+-- Таблица для хранения заказов
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    telegram_id BIGINT NOT NULL,
+    box_id INT DEFAULT NULL REFERENCES boxes(id) ON DELETE SET NULL, -- ID выбранной коробки
+    custom_products INT[] DEFAULT NULL, -- Массив ID товаров для кастомной коробки
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Время создания заказа
+    scheduled_time TIMESTAMP DEFAULT NULL, -- Время, на которое заказан товар, может быть NULL
+    total_price DECIMAL(10, 2) NOT NULL, -- Общая цена заказа
+    location TEXT NOT NULL -- Место получения заказа
+);
